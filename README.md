@@ -1,7 +1,13 @@
-# NX1 LineageOS 24.0 build project
+# lineage-nx1
 
-LineageOS **24.0 (Android 17)** for the **Bluefox NX1** (`yk313_k69v1_64`,
-MediaTek MT6769V/CB / Helio G81).
+LineageOS for the **Bluefox NX1** (`yk313_k69v1_64`, MediaTek MT6769V/CB /
+Helio G81).
+
+The repository name deliberately omits the Android version: this project
+tracks whatever LineageOS branch the device tree currently supports, and
+naming it `lineage-24` would mean renaming it again for 25.0. The target
+branch lives in one place — `LINEAGE_BRANCH` in `build.sh`, default
+`lineage-24.0` (Android 17).
 
 The device has no official LineageOS support. The community device tree
 exists only on `lineage-23.2` (Android 16). This project does the branch
@@ -59,10 +65,10 @@ crave run -- brunch NX1 -j$(nproc)
 
 ```bash
 # AX42: Ryzen 5 3600 / 32 GB / 2x512 GB NVMe, Ubuntu 24.04
-scp -r . root@<host>:~/nx1-lineage24
+scp -r . root@<host>:~/lineage-nx1
 ssh root@<host>
-  sudo ./nx1-lineage24/scripts/setup-host.sh   # installs packages + 32 GB swap
-  cd ~/nx1-lineage24 && ./build.sh
+  sudo ./lineage-nx1/scripts/setup-host.sh   # installs packages + 32 GB swap
+  cd ~/lineage-nx1 && ./build.sh
 ```
 
 Destroy the server when done. A cold build costs well under €1.
@@ -90,8 +96,8 @@ the disk is still not there.
 ## Procedure
 
 ```bash
-git clone <this-repo> ~/nx1-lineage24
-cd ~/nx1-lineage24
+git clone <this-repo> ~/lineage-nx1
+cd ~/lineage-nx1
 
 # one shot
 ./build.sh

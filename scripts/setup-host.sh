@@ -144,8 +144,8 @@ Swap   : $(free -g | awk '/Swap/{print $2}') GB
 Next, as ${TARGET_USER}:
 
   # 1. get this project
-  git clone <your-fork-url> ~/nx1-lineage24
-  cd ~/nx1-lineage24
+  git clone <your-fork-url> ~/lineage-nx1
+  cd ~/lineage-nx1
 
   # 2. full build (sync + patch + compile)
   ./build.sh
