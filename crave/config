@@ -1,0 +1,38 @@
+# Crave configuration for LineageOS 24.0 / Bluefox NX1
+#
+# Place this file at <lineage-source-root>/.crave/config after running
+# `crave init`, or copy it in before the first `crave run`.
+#
+# Resource needs for a lineage-24.0 cold build:
+#   source checkout : ~200 GB
+#   out/ directory  : ~250 GB
+#   ccache          : 100 GB
+#   ---------------------------------
+#   total           : ~550 GB  -> request 600 GB from Crave support
+#
+# Request these limits when your account is provisioned. The free tier
+# defaults are smaller than what AOSP needs.
+
+config_version: v1
+
+container:
+  host_components:
+    - rsync
+  user_components:
+    - rsync
+  volumes:
+    - /tmp
+  network: ~
+
+project:
+  clone:
+    depth: 1
+  bare_clone: true
+  rsync_enabled: true
+  rsync_delete: true
+  rsync_args:
+    - -avhP
+    - --filter=:- .gitignore
+  upload_pack: false
+  checkout_strategy: clone
+  make_pack: true

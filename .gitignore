@@ -1,0 +1,29 @@
+# Build artifacts
+out/
+*.img
+*.zip
+*.log
+
+# Patch application leftovers
+.repo/rebase/
+device/bluefox/NX1/.git/rebase-apply/
+
+# Editor / OS
+.DS_Store
+*.swp
+*~
+.idea/
+.vscode/
+
+# Crave local state
+.crave/local/
+
+# Never commit these even by accident: they carry per-device identity
+persist.img
+nvram.img
+nvdata.img
+nvcfg.img
+seccfg.img
+proinfo.img
+protect1.img
+protect2.img

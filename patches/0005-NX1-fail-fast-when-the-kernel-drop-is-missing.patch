@@ -1,0 +1,43 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: mouyase <mouyase@example.com>
+Date: Tue, 10 Nov 2026 21:26:49 +0800
+Subject: [PATCH] NX1: fail fast when the kernel drop is missing
+
+The kernel, dtbo and module lists live in a separate repository
+(android_device_bluefox_NX1-kernels) that is pulled in by the local
+manifest. If that repo fails to sync, or a future drop renames files,
+the build does not notice during configuration -- it runs for 40 minutes
+and then dies inside make with an unhelpful 'no rule to make target'.
+
+Check the two paths that must exist and error out at configure time with
+a message that names the repo to look at.
+---
+ device/bluefox/NX1/BoardConfig.mk | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
+
+diff --git a/device/bluefox/NX1/BoardConfig.mk b/device/bluefox/NX1/BoardConfig.mk
+index 8bf30cc..faa0afe 100644
+--- a/device/bluefox/NX1/BoardConfig.mk
++++ b/device/bluefox/NX1/BoardConfig.mk
+@@ -167,6 +167,21 @@ BOARD_PREBUILT_DTBIMAGE_DIR := $(TARGET_KERNEL_DIR)
+ BOARD_PREBUILT_DTBOIMAGE := $(TARGET_KERNEL_DIR)/dtbo.img
+ TARGET_PREBUILT_KERNEL := $(TARGET_KERNEL_DIR)/$(BOARD_KERNEL_IMAGE_NAME)
+ 
++# Fail during product configuration rather than 40 minutes into the build
++# when the kernel drop is missing. The kernels repo is a binary dump on a
++# lineage-23.2 branch; the branch name is irrelevant to the binaries, but
++# the repo itself has to be present.
++ifeq ($(wildcard $(TARGET_PREBUILT_KERNEL)),)
++$(error NX1: prebuilt kernel missing at $(TARGET_PREBUILT_KERNEL). It comes \
++from Bluefox-Devices-Development/android_device_bluefox_NX1-kernels. \
++Check .repo/local_manifests/nx1.xml and re-run repo sync.)
++endif
++
++ifeq ($(wildcard $(BOARD_PREBUILT_DTBOIMAGE)),)
++$(error NX1: dtbo.img missing at $(BOARD_PREBUILT_DTBOIMAGE). Same cause: \
++the kernels repo did not sync.)
++endif
++
+ ALL_VENDOR_RAMDISK_MODULES := $(sort $(BOARD_VENDOR_RAMDISK_KERNEL_MODULES_LOAD) $(BOARD_VENDOR_RAMDISK_RECOVERY_KERNEL_MODULES_LOAD))
+ BOARD_SYSTEM_KERNEL_MODULES := $(addprefix $(BOARD_KERNEL_MODULE_DIR)/,$(BOARD_SYSTEM_KERNEL_MODULES_LOAD))
+ BOARD_VENDOR_KERNEL_MODULES := $(addprefix $(BOARD_KERNEL_MODULE_DIR)/,$(BOARD_VENDOR_KERNEL_MODULES_LOAD))

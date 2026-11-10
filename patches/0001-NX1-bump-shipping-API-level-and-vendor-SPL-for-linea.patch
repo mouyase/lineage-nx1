@@ -1,0 +1,41 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: mouyase <mouyase@example.com>
+Date: Tue, 10 Nov 2026 21:25:57 +0800
+Subject: [PATCH] NX1: bump shipping API level and vendor SPL for lineage-24.0
+
+LineageOS 24.0 targets Android 17 (API 37). The device tree was written
+for lineage-23.2 (Android 16 / API 36), so PRODUCT_SHIPPING_API_LEVEL has
+to move to 37 or the framework rejects the build with an SdkVersion
+mismatch at boot.
+
+BOARD_SHIPPING_API_LEVEL stays at 30 and BOARD_API_LEVEL_PROP_OVERRIDE
+stays at 202404: both describe the hardware and the stock vendor image
+(Android 11 original shipping, Android 14 vendor api_level), not the ROM
+being built. Changing them breaks vintf checks against vendor.
+
+VENDOR_SECURITY_PATCH is corrected to 2025-10-05 because that is what the
+stock vendor image actually reports, not the 2026-03-05 the tree claimed.
+---
+ device/bluefox/NX1/device.mk | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/device/bluefox/NX1/device.mk b/device/bluefox/NX1/device.mk
+index ba36584..abb58a5 100644
+--- a/device/bluefox/NX1/device.mk
++++ b/device/bluefox/NX1/device.mk
+@@ -18,12 +18,12 @@ PRODUCT_PACKAGES += \
+ # Shipping API Level
+ BOARD_API_LEVEL_PROP_OVERRIDE := 202404
+ BOARD_SHIPPING_API_LEVEL := 30
+-PRODUCT_SHIPPING_API_LEVEL := 35
++PRODUCT_SHIPPING_API_LEVEL := 37
+ 
+ # SPL
+-BOOT_SECURITY_PATCH := 2026-03-05
++BOOT_SECURITY_PATCH := 2025-10-05
+ INIT_BOOT_SECURITY_PATCH := $(BOOT_SECURITY_PATCH)
+-VENDOR_SECURITY_PATCH := $(BOOT_SECURITY_PATCH)
++VENDOR_SECURITY_PATCH := 2025-10-05
+ 
+ # Inherit generic_ramdisk product configuration
+ $(call inherit-product, $(SRC_TARGET_DIR)/product/generic_ramdisk.mk)

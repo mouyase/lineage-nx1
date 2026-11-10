@@ -1,0 +1,49 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: mouyase <mouyase@example.com>
+Date: Tue, 10 Nov 2026 21:26:07 +0800
+Subject: [PATCH] NX1: add zh_CN locale for complete Chinese localization
+
+The tree builds with whatever locale set LineageOS defaults to, which
+does not include zh_CN. The visible result is a half translated UI:
+framework strings fall back to English while bundled apps ship Chinese,
+so one screen shows both languages.
+
+Declaring zh_CN as the default locale makes Settings, SystemUI, the
+Lineage settings app and the bundled AOSP apps all compile their Chinese
+resources into the image.
+---
+ device/bluefox/NX1/device.mk      | 4 ++++
+ device/bluefox/NX1/lineage_NX1.mk | 5 +++++
+ 2 files changed, 9 insertions(+)
+
+diff --git a/device/bluefox/NX1/device.mk b/device/bluefox/NX1/device.mk
+index abb58a5..259d34a 100644
+--- a/device/bluefox/NX1/device.mk
++++ b/device/bluefox/NX1/device.mk
+@@ -9,6 +9,10 @@ DEVICE_PATH := device/bluefox/NX1
+ TARGET_SCREEN_WIDTH := 540
+ TARGET_SCREEN_HEIGHT := 1168
+ 
++# Locale support
++PRODUCT_LOCALES += zh_CN
++PRODUCT_LOCALES += en_US
++
+ # Overlays
+ PRODUCT_PACKAGES += \
+     ApertureOverlayNX1 \
+diff --git a/device/bluefox/NX1/lineage_NX1.mk b/device/bluefox/NX1/lineage_NX1.mk
+index d1347a2..f9892d8 100644
+--- a/device/bluefox/NX1/lineage_NX1.mk
++++ b/device/bluefox/NX1/lineage_NX1.mk
+@@ -13,6 +13,11 @@ $(call inherit-product, device/bluefox/NX1/device.mk)
+ # Keep ADB available while the bootloader reports a spoofed locked state.
+ WITH_ADB_INSECURE := true
+ 
++# Locales. zh_CN listed first so a freshly reset device comes up in
++# Chinese instead of silently falling back to English.
++PRODUCT_LOCALES := zh_CN en_US
++PRODUCT_DEFAULT_LOCALE := zh_CN
++
+ # Inherit some common LineageOS stuff.
+ $(call inherit-product, vendor/lineage/config/common_full_phone.mk)
+ 

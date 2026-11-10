@@ -1,0 +1,43 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: mouyase <mouyase@example.com>
+Date: Tue, 10 Nov 2026 21:26:18 +0800
+Subject: [PATCH] NX1: empty lineage.dependencies, resolution is in the local
+ manifest
+
+lineage.dependencies pins three repos by name with no revision. When
+'breakfast NX1' runs, roomservice resolves those names against the
+LineageOS upstream manifest, so sepolicy_vndr and hardware_mediatek get
+checked out from LineageOS instead of the Bluefox forks. The upstream
+repos have no MT6768 support, so the build fails on missing MTK HALs.
+
+Both Bluefox forks do have lineage-24.0 branches, but roomservice has no
+way to know to use them. All three dependencies are now declared with
+explicit revisions in .repo/local_manifests/nx1.xml, making this file
+redundant. Leaving it non-empty actively causes a second conflicting
+checkout attempt, so it is reduced to an empty array that breakfast can
+still parse.
+---
+ device/bluefox/NX1/lineage.dependencies | 16 +---------------
+ 1 file changed, 1 insertion(+), 15 deletions(-)
+
+diff --git a/device/bluefox/NX1/lineage.dependencies b/device/bluefox/NX1/lineage.dependencies
+index 1764468..fe51488 100644
+--- a/device/bluefox/NX1/lineage.dependencies
++++ b/device/bluefox/NX1/lineage.dependencies
+@@ -1,15 +1 @@
+-[
+-  {
+-    "repository": "android_device_bluefox_NX1-kernels",
+-    "target_path": "device/bluefox/NX1-kernels",
+-    "remote": "github"
+-  },
+-  {
+-    "repository": "android_device_mediatek_sepolicy_vndr",
+-    "target_path": "device/mediatek/sepolicy_vndr"
+-  },
+-  {
+-    "repository": "android_hardware_mediatek",
+-    "target_path": "hardware/mediatek"
+-  }
+-]
++[]

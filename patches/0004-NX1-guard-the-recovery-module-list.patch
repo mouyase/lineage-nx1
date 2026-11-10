@@ -1,0 +1,45 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: mouyase <mouyase@example.com>
+Date: Tue, 10 Nov 2026 21:26:42 +0800
+Subject: [PATCH] NX1: guard the recovery module list
+
+The prebuilt kernel drop ships vendor_ramdisk.modules.load.recovery
+separately from the normal boot module list, because recovery runs a
+different set: it needs the display panel and touch controller drivers
+before the UI comes up.
+
+BoardConfig.mk already referenced that file, but a missing or renamed
+list fails silently -- recovery just boots with the normal module set,
+the panel never initialises, and the screen stays black with no input.
+
+Warn at configure time instead. Recovery being unusable matters because
+it is the sideload target for every OTA, so a silent breakage is only
+discovered when an update is already needed.
+---
+ device/bluefox/NX1/BoardConfig.mk | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/device/bluefox/NX1/BoardConfig.mk b/device/bluefox/NX1/BoardConfig.mk
+index e41f629..8bf30cc 100644
+--- a/device/bluefox/NX1/BoardConfig.mk
++++ b/device/bluefox/NX1/BoardConfig.mk
+@@ -149,10 +149,19 @@ BOARD_VENDOR_RAMDISK_KERNEL_MODULES_LOAD := $(strip $(shell cat $(TARGET_KERNEL_
+ BOARD_VENDOR_RAMDISK_RECOVERY_KERNEL_MODULES_LOAD := $(strip $(shell cat $(TARGET_KERNEL_DIR)/vendor_ramdisk.modules.load.recovery))
+ 
+ # Recovery does not run the vendor module loader used during a normal boot.
++# Both Jadard touch controllers are listed because the panel variant cannot
++# be determined at build time; without the matching driver the display stays
++# dark in recovery and no input is accepted.
+ BOARD_VENDOR_RAMDISK_RECOVERY_KERNEL_MODULES_LOAD += \
+     jd9365tg_i2c.ko \
+     jd9365tn_i2c.ko
+ 
++ifeq ($(wildcard $(TARGET_KERNEL_DIR)/vendor_ramdisk.modules.load.recovery),)
++$(warning NX1: vendor_ramdisk.modules.load.recovery not found - \
++recovery will fall back to the normal module list and the panel may not \
++light up. Check the kernels repo synced correctly.)
++endif
++
+ BOARD_KERNEL_MODULE_DIR := $(TARGET_KERNEL_DIR)
+ BOARD_PREBUILT_DTBIMAGE_DIR := $(TARGET_KERNEL_DIR)
+ BOARD_PREBUILT_DTBOIMAGE := $(TARGET_KERNEL_DIR)/dtbo.img
